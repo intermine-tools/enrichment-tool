@@ -1,0 +1,22 @@
+{
+  "name": "enrichment-tool",
+  "version": "0.1.0",
+  "homepage": "https://github.com/alexkalderimis/enrichment-tool",
+  "authors": [
+    "Alex Kalderimis <alexkalderimis@gmail.com>"
+  ],
+  "description": "An intermine steps tool for displaying enrichment results.",
+  "main": "index.js",
+  "license": "Apache2",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jschannel": "mozilla/jschannel",
+    "spin.js": "~2.0.1"
+  }
+}
