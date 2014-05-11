@@ -147,6 +147,7 @@ function modifyStyle () {
   ensureHasClass('.group', 'form-group');
   ensureHasClass('.btn', 'btn-default');
   ensureHasClass('.group select', 'form-control');
+  ensureHasClass('.group > .btn', 'form-control');
 
   function ensureHasClass(selector, className) {
     var i, l, elems, e, classes;
