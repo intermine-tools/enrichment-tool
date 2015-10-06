@@ -23,7 +23,8 @@ spinner = new Spinner({
   radius: 100,
   length: 100,
   width: 50,
-  lines: 12
+  lines: 12,
+  scale: 0.5
 });
 
 spinnerEl = document.getElementById('spinner');
@@ -151,7 +152,7 @@ function modifyStyle () {
 
   function ensureHasClass(selector, className) {
     var i, l, elems, e, classes;
-    
+
     elems = document.querySelectorAll(selector);
 
     for (i = 0, l = elems.length; i < l; i++) {
@@ -163,4 +164,3 @@ function modifyStyle () {
     }
   }
 }
-
