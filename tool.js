@@ -69,7 +69,7 @@ chan.bind('init', function (trans, params) {
 
   try {
     config.matchCb = hasItem;
-    config.resultsCb = wantsTable;
+    config.resultsCb = hasQuery;
     config.listCb = wantsList;
 
     config.errorCorrection = request.correction;
@@ -87,6 +87,7 @@ chan.bind('init', function (trans, params) {
   }
 
 
+
   function hasItem (id, type) {
     // Notify as generic and specific item.
     chan.notify({
@@ -102,6 +103,7 @@ chan.bind('init', function (trans, params) {
         }
       }
     });
+  /* Does this ever do anthing meaningful? */
     chan.notify({
       method: 'has',
       params: {
@@ -117,6 +119,7 @@ chan.bind('init', function (trans, params) {
   }
 
   function wantsTable (query) {
+    debugger;
     chan.notify({
       method: 'wants',
       params: {
@@ -134,6 +137,19 @@ chan.bind('init', function (trans, params) {
       method: 'wants',
       params: {
         what: 'list',
+        data: {
+          query: query,
+          service: { root: service.root }
+        }
+      }
+    });
+  }
+
+  function hasQuery (query) {
+    chan.notify({
+      method: 'has',
+      params: {
+        what: 'query',
         data: {
           query: query,
           service: { root: service.root }
