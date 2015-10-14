@@ -11,7 +11,7 @@
  *   - has-item
  */
 
-var chan, options, spinner, spinnerEl, ListWidgets;
+var chan, options, spinner, spinnerEl, ListWidgets, nextStepsInitialised = false;
 
 ListWidgets = window['list-widgets'];
 
@@ -31,7 +31,7 @@ spinnerEl = document.getElementById('spinner');
 spinner.spin();
 spinnerEl.appendChild(spinner.el);
 
-setInterval(modifyStyle, 100);
+setInterval(overrideDefaults, 100);
 
 chan = Channel.build({
   window: window.parent,
@@ -61,6 +61,7 @@ chan.bind('style', function (trans, params) {
 });
 
 chan.bind('init', function (trans, params) {
+
   var widgets
     , request = params.request
     , service = params.service
@@ -70,7 +71,7 @@ chan.bind('init', function (trans, params) {
   try {
     config.matchCb = hasItem;
     config.resultsCb = hasQuery;
-    config.listCb = wantsList;
+    config.listCb = hasQuery;
 
     config.errorCorrection = request.correction;
     config.pValue = request.maxp;
@@ -82,10 +83,12 @@ chan.bind('init', function (trans, params) {
 
     widgets = new ListWidgets(service);
     widgets.enrichment(request.enrichment, request.list, element, config);
+
+
+
   } catch (e) {
     trans.error('InitialisationError', String(e));
   }
-
 
 
   function hasItem (id, type) {
@@ -118,33 +121,6 @@ chan.bind('init', function (trans, params) {
     });
   }
 
-  function wantsTable (query) {
-    debugger;
-    chan.notify({
-      method: 'wants',
-      params: {
-        what: 'table',
-        data: {
-          query: query,
-          service: { root: service.root }
-        }
-      }
-    });
-  }
-
-  function wantsList (query) {
-    chan.notify({
-      method: 'wants',
-      params: {
-        what: 'list',
-        data: {
-          query: query,
-          service: { root: service.root }
-        }
-      }
-    });
-  }
-
   function hasQuery (query) {
     chan.notify({
       method: 'has',
@@ -157,7 +133,6 @@ chan.bind('init', function (trans, params) {
       }
     });
   }
-
 });
 
 function modifyStyle () {
@@ -166,6 +141,21 @@ function modifyStyle () {
   ensureHasClass('.group select', 'form-control');
   ensureHasClass('.group > .btn', 'form-control');
 
+  if(!nextStepsInitialised) {
+    emitEvents();
+  }
+
+
+  function emitEvents(){
+    try {
+      document.querySelector('.view').click();
+      document.querySelector('.results').click();
+      console.log('yay');
+      nextStepsInitialised = true;
+    } catch (e) {
+      console.error(e);
+    }
+  }
   function ensureHasClass(selector, className) {
     var i, l, elems, e, classes;
 
@@ -179,4 +169,6 @@ function modifyStyle () {
       }
     }
   }
+
+
 }
