@@ -31,6 +31,8 @@ spinnerEl = document.getElementById('spinner');
 spinner.spin();
 spinnerEl.appendChild(spinner.el);
 
+//this is a bit crazy but it is hard to get the order of
+//initialisation right with jschannel init, frames, and DOM inits.
 setInterval(overrideDefaults, 100);
 
 chan = Channel.build({
@@ -135,25 +137,32 @@ chan.bind('init', function (trans, params) {
   }
 });
 
-function modifyStyle () {
+/**
+ * This is looped over every 100 ms to ensure all elements get styled correctly.
+ * Any once-off events can go in the if block.
+ */
+function overrideDefaults () {
   ensureHasClass('.group', 'form-group');
   ensureHasClass('.btn', 'btn-default');
   ensureHasClass('.group select', 'form-control');
   ensureHasClass('.group > .btn', 'form-control');
 
+  //this will only happen once.
   if(!nextStepsInitialised) {
     emitEvents();
   }
 
-
+  /**
+   * When this is first run, the elements may not be initialised yet.
+   *
+   */
   function emitEvents(){
     try {
       document.querySelector('.view').click();
       document.querySelector('.results').click();
-      console.log('yay');
       nextStepsInitialised = true;
     } catch (e) {
-      console.error(e);
+      console.warn(e, "If this error occured during app initialisation it is probably not a problem.");
     }
   }
   function ensureHasClass(selector, className) {
@@ -169,6 +178,4 @@ function modifyStyle () {
       }
     }
   }
-
-
 }
