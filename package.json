@@ -24,7 +24,7 @@
     "widget"
   ],
   "author": "Alex Kalderimis",
-  "license": "Apache2",
+  "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/alexkalderimis/enrichment-tool/issues"
   },
@@ -33,6 +33,6 @@
   },
   "dependencies": {
     "express": ">=3.4.8",
-    "bower": "~1.2.8"
+    "bower": "~1.5.3"
   }
 }

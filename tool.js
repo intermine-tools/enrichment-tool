@@ -11,7 +11,7 @@
  *   - has-item
  */
 
-var chan, options, spinner, spinnerEl, ListWidgets;
+var chan, options, spinner, spinnerEl, ListWidgets, nextStepsInitialised = false;
 
 ListWidgets = window['list-widgets'];
 
@@ -23,14 +23,17 @@ spinner = new Spinner({
   radius: 100,
   length: 100,
   width: 50,
-  lines: 12
+  lines: 12,
+  scale: 0.5
 });
 
 spinnerEl = document.getElementById('spinner');
 spinner.spin();
 spinnerEl.appendChild(spinner.el);
 
-setInterval(modifyStyle, 100);
+//this is a bit crazy but it is hard to get the order of
+//initialisation right with jschannel init, frames, and DOM inits.
+setInterval(overrideDefaults, 100);
 
 chan = Channel.build({
   window: window.parent,
@@ -60,6 +63,7 @@ chan.bind('style', function (trans, params) {
 });
 
 chan.bind('init', function (trans, params) {
+
   var widgets
     , request = params.request
     , service = params.service
@@ -68,8 +72,8 @@ chan.bind('init', function (trans, params) {
 
   try {
     config.matchCb = hasItem;
-    config.resultsCb = wantsTable;
-    config.listCb = wantsList;
+    config.resultsCb = hasQuery;
+    config.listCb = hasQuery;
 
     config.errorCorrection = request.correction;
     config.pValue = request.maxp;
@@ -81,6 +85,9 @@ chan.bind('init', function (trans, params) {
 
     widgets = new ListWidgets(service);
     widgets.enrichment(request.enrichment, request.list, element, config);
+
+
+
   } catch (e) {
     trans.error('InitialisationError', String(e));
   }
@@ -101,6 +108,7 @@ chan.bind('init', function (trans, params) {
         }
       }
     });
+  /* Does this ever do anthing meaningful? */
     chan.notify({
       method: 'has',
       params: {
@@ -115,11 +123,11 @@ chan.bind('init', function (trans, params) {
     });
   }
 
-  function wantsTable (query) {
+  function hasQuery (query) {
     chan.notify({
-      method: 'wants',
+      method: 'has',
       params: {
-        what: 'table',
+        what: 'query',
         data: {
           query: query,
           service: { root: service.root }
@@ -127,31 +135,39 @@ chan.bind('init', function (trans, params) {
       }
     });
   }
-
-  function wantsList (query) {
-    chan.notify({
-      method: 'wants',
-      params: {
-        what: 'list',
-        data: {
-          query: query,
-          service: { root: service.root }
-        }
-      }
-    });
-  }
-
 });
 
-function modifyStyle () {
+/**
+ * This is looped over every 100 ms to ensure all elements get styled correctly.
+ * Any once-off events can go in the if block.
+ */
+function overrideDefaults () {
   ensureHasClass('.group', 'form-group');
   ensureHasClass('.btn', 'btn-default');
   ensureHasClass('.group select', 'form-control');
   ensureHasClass('.group > .btn', 'form-control');
 
+  //this will only happen once.
+  if(!nextStepsInitialised) {
+    emitEvents();
+  }
+
+  /**
+   * When this is first run, the elements may not be initialised yet.
+   *
+   */
+  function emitEvents(){
+    try {
+      document.querySelector('.view').click();
+      document.querySelector('.results').click();
+      nextStepsInitialised = true;
+    } catch (e) {
+      console.warn(e, "If this error occured during app initialisation it is probably not a problem.");
+    }
+  }
   function ensureHasClass(selector, className) {
     var i, l, elems, e, classes;
-    
+
     elems = document.querySelectorAll(selector);
 
     for (i = 0, l = elems.length; i < l; i++) {
@@ -163,4 +179,3 @@ function modifyStyle () {
     }
   }
 }
-

@@ -1,3 +1,11 @@
 #main .header {
     padding-left: 1em;
 }
+
+.popover {
+  visibility:hidden;
+}
+
+#main.staircase .actions {
+  display:none;
+}
